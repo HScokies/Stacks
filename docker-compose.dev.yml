@@ -1,0 +1,43 @@
+﻿version: '3.4'
+networks:
+  api:
+
+services:
+    database:
+        container_name: MongoDB
+        image: mongo
+        restart: always
+        ports:
+            - '41400:27017'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: admin
+        volumes:
+            - stacks:/src/data/database
+        networks:
+            - api
+    
+    webapi:
+        container_name: stacks_api
+        image: ${DOCKER_REGISTRY-}stacksapi
+        ports:
+            - '41401:80'
+        build:
+            context: .
+            dockerfile: Dockerfile
+        depends_on:
+            - database
+        environment:
+            - HOST=localhost
+            - DATABASE=stacks
+            - COLLECTION=userStacks
+            - PORT=27017
+            - USER=root
+            - PWD=admin
+        volumes:
+            - stacks:/src/app
+        networks:
+            - api
+
+volumes:
+    stacks:
