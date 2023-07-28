@@ -4,8 +4,8 @@ namespace Stacks_rework.Services
 {
     public class DatabaseException : Exception
     {
-        public ActionResult status { get; }
-        public DatabaseException(ActionResult status)
+        public int status { get; }
+        public DatabaseException(int status)
         {
             this.status = status;
         }
