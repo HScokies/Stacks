@@ -3,6 +3,6 @@
     public class AdvertisementStack : BaseStack
     {
         public Organisation organisation { get; set; } = null!;
-        protected bool isActive { get; set; } = false;
+        public bool isActive { get; set; } = false;
     }
 }

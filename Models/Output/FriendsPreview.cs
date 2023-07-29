@@ -7,7 +7,7 @@
             this.uid = uid;
             this.amount = amount;
         }
-        public string uid { get; set; } = null!;
+        public string uid { get; set; } = null!; // VK Web App Get User Info
         public long amount { get; set; } = 0;
     }
 }
