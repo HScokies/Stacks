@@ -9,12 +9,12 @@ namespace Stacks_rework.Services
     {
         private IMongoCollection<UserStack> userStacks;
         private IMongoCollection<AdvertisementStack> advertisementStacks;
-        private IMongoCollection<Organisation> organisations;
+        private IMongoCollection<Organization> organizations;
         public StacksService(AppDbContext context)
         {
             userStacks = context.database.GetCollection<UserStack>("userStacks");
             advertisementStacks = context.database.GetCollection<AdvertisementStack>("adStacks");
-            organisations = context.database.GetCollection<Organisation>("organisations");
+            organizations = context.database.GetCollection<Organization>("organisations");
         }
 
         public async Task<UserStack> Create(UserStack userStack)
@@ -27,9 +27,10 @@ namespace Stacks_rework.Services
 
         public async Task<AdvertisementStack> CreateAdvertisementStack(AdvertisementStack adStack, string companyToken)
         {
-            if (companyToken != adStack.token) throw new DatabaseException(StatusCodes.Status400BadRequest);
-            var res = await organisations.Find(o => o.token == companyToken).FirstOrDefaultAsync();
+            if (companyToken != adStack?.organization?.token) throw new DatabaseException(StatusCodes.Status400BadRequest);
+            var res = await organizations.Find(o => o.token == companyToken).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status401Unauthorized);
+            adStack.isActive = false;
             await advertisementStacks.InsertOneAsync(adStack);
             return adStack;
         }
@@ -44,12 +45,12 @@ namespace Stacks_rework.Services
 
         public async Task<List<StackPreview>> GetAdsPreview()
         {
-            var orgs = await organisations.Find(_ => true).ToListAsync();
+            var orgs = await organizations.Find(_ => true).ToListAsync();
 
             List<StackPreview> adPreview = new();
             foreach (var org in orgs)
             {
-                var count = await advertisementStacks.Find(s => s.organisation == org && s.isActive == true).CountDocumentsAsync();
+                var count = await advertisementStacks.Find(s => s.organization == org && s.isActive == true).CountDocumentsAsync();
                 if (count == 0) continue;
                 StackPreview stack = new(
                     name:   org.name, 
@@ -103,7 +104,7 @@ namespace Stacks_rework.Services
             {
                 StackPreview stackPreview = new(
                     name: stack.name,
-                    thumb: stack.thumbnail,
+                    thumb: stack.thumbnail!,
                     amount: stack.cards.Count()
                 );
                 stacksPreview.Add(stackPreview);
@@ -113,14 +114,14 @@ namespace Stacks_rework.Services
 
         public async Task<List<StackPreview>> ListOrgStacks(string orgId)
         {
-            var stacks = await advertisementStacks.Find(s => s.organisation.id == orgId && s.isActive == true).ToListAsync();
+            var stacks = await advertisementStacks.Find(s => s.organization.id == orgId && s.isActive == true).ToListAsync();
 
             List<StackPreview> stacksPreview = new();
             foreach (var stack in stacks)
             {
                 StackPreview stackPreview = new(
                     name: stack.name,
-                    thumb: stack.thumbnail,
+                    thumb: stack.thumbnail!,
                     amount: stack.cards.Count()
                 );
                 stacksPreview.Add(stackPreview);
@@ -136,7 +137,7 @@ namespace Stacks_rework.Services
             {
                 StackPreview stackPreview = new(
                     name: stack.name,
-                    thumb: stack.thumbnail,
+                    thumb: stack.thumbnail!,
                     amount: stack.cards.Count()
                 );
                 stacksPreview.Add(stackPreview);
@@ -148,7 +149,7 @@ namespace Stacks_rework.Services
         {
             var res = await advertisementStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
-            if (res.token != token || res.organisation.id != ownerid) throw new DatabaseException(StatusCodes.Status403Forbidden);
+            if (res.token != token || res.organization.id != ownerid) throw new DatabaseException(StatusCodes.Status403Forbidden);
             res = newStack.AutoMap<UpdateStack, AdvertisementStack>();
             await advertisementStacks.ReplaceOneAsync(s => s.id == id, res);
             return res;

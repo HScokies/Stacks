@@ -12,7 +12,7 @@ namespace Stacks_rework.Models
         [JsonIgnore]
         public string? token { get; set; } = null!;
         [Url]
-        public string thumbnail { get; set; } = null!;
+        public string? thumbnail { get; set; } = null!;
         public string name { get; set; } = null!;
         public List<Card> cards { get; set; } = null!;
     }
