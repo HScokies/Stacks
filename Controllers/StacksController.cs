@@ -21,10 +21,8 @@ namespace Stacks_rework.Controllers
         }
 
         [HttpPost("stacks")]
-        public async Task<ActionResult<UserStack>> Create(UserStack stack, [FromHeader] string token)
+        public async Task<ActionResult<UserStack>> Create(UserStack stack)
         {
-            if (!ValidateUID(stack.uid)) return BadRequest();
-            stack.token = stack.token is null ? token : stack.token;
             try
             {
                 var res = await stacksRepos.Create(stack);
@@ -37,25 +35,119 @@ namespace Stacks_rework.Controllers
         }
         
         [HttpPost("stacks/ad")]
-        public async Task<ActionResult<AdvertisementStack>> Create(AdvertisementStack stack, [FromHeader] string token)
+        public async Task<ActionResult<AdvertisementStack>> Create(AdvertisementStack stack)
         {
             try
             {
-                var res = await stacksRepos.CreateAdvertisementStack(stack, token);
+                var res = await stacksRepos.CreateAdvertisementStack(stack);
                 return Created(res.id!, res);
             }
-            catch(DatabaseException ex)
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpGet("stacks/{id:length(24)}")]
+        public async Task<ActionResult<UserStack>> Read(string id,[FromHeader] string token,[FromHeader] string uid)
+        {
+            try
+            {
+                return Ok(await stacksRepos.GetUserStack(
+                    id: id,
+                    token: token,
+                    uid: uid
+                ));
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpGet("stacks/ad/{id:length(24)}")]
+        public async Task<ActionResult<AdvertisementStack>> Read(string id)
+        {
+            try
+            {
+                return Ok(await stacksRepos.GetAdStack(id));
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpPut("stacks/{id:length(24)}")]
+        public async Task<ActionResult<UserStack>> Update(string id, [FromHeader] string token, [FromHeader] string uid, UpdateStack newStack)
+        {
+            try
+            {
+                return await stacksRepos.UpdateUserStack(
+                    id: id,
+                    ownerid: uid,
+                    token: token,
+                    newStack: newStack
+                );
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+        
+        [HttpPut("stacks/ad/{id:length(24)}")]
+        public async Task<ActionResult<AdvertisementStack>> Update(string id, [FromHeader] string token, UpdateStack newStack)
+        {
+            try
+            {
+                return await stacksRepos.UpdateOrgStack(
+                    id: id,
+                    token: token,
+                    newStack: newStack
+                );
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpDelete("stacks/{id:length(24)}")]
+        public async Task<ActionResult> Delete(string id, [FromHeader] string token, [FromHeader] string uid)
+        {
+            try
+            {
+                await stacksRepos.DropUserStack(
+                    id: id,
+                    ownerid: uid,
+                    token: token
+                );
+                return NoContent();
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpDelete("stacks/ad/{id:length(24)}")]
+        public async Task<ActionResult> Delete(string id, [FromHeader] string token)
+        {
+            try
+            {
+                await stacksRepos.DropOrgStack(
+                    id: id,
+                    token: token
+                );
+                return NoContent();
+            }
+            catch (DatabaseException ex)
             {
                 return StatusCode(ex.status);
             }
         }
 
 
-
-        private bool ValidateUID(string uid)
-        {
-            if (uid.Length != 9) return false;
-            return int.TryParse(uid, out _);
-        }
     }
 }

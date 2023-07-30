@@ -19,20 +19,30 @@ namespace Stacks_rework.Services
 
         public async Task<UserStack> Create(UserStack userStack)
         {
+            if (!Helpers.ValidateAuth(userStack.uid, userStack.token)) throw new DatabaseException(StatusCodes.Status400BadRequest);
             var res = await userStacks.Find(u => u.uid == userStack.uid).FirstOrDefaultAsync();
-            if (res!=null && res.token != userStack.token) throw new DatabaseException(StatusCodes.Status409Conflict);
+            if (res!=null && res.token != userStack.token) throw new DatabaseException(StatusCodes.Status401Unauthorized);
             await userStacks.InsertOneAsync(userStack);
-            return userStack;
+            return Helpers.hideToken(userStack);
         }
 
-        public async Task<AdvertisementStack> CreateAdvertisementStack(AdvertisementStack adStack, string companyToken)
+        public async Task<AdvertisementStack> CreateAdvertisementStack(AdvertisementStack adStack)
         {
-            if (companyToken != adStack?.organization?.token) throw new DatabaseException(StatusCodes.Status400BadRequest);
-            var res = await organizations.Find(o => o.token == companyToken).FirstOrDefaultAsync();
+            if (!Helpers.ValidateAuth(adStack.token)) throw new DatabaseException(StatusCodes.Status400BadRequest);
+            var res = await organizations.Find(o => o.token == adStack.token).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status401Unauthorized);
+            adStack.organization = res;
             adStack.isActive = false;
             await advertisementStacks.InsertOneAsync(adStack);
-            return adStack;
+            return Helpers.hideToken(adStack);
+        }
+
+        public async Task DropOrgStack(string id, string token)
+        {
+            var res = await advertisementStacks.Find(s => s.id == id).FirstOrDefaultAsync();
+            if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
+            if (res.token != token) throw new DatabaseException(StatusCodes.Status403Forbidden);
+            await advertisementStacks.DeleteOneAsync(s => s == res);
         }
 
         public async Task DropUserStack(string id, string ownerid, string token)
@@ -67,7 +77,7 @@ namespace Stacks_rework.Services
             var res = await advertisementStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
             if (res.isActive == false) throw new DatabaseException(StatusCodes.Status423Locked);
-            return res;
+            return Helpers.hideToken(res);
         }
 
         public async Task<List<FriendsPreview>> GetFriendsPreview(IEnumerable<string> friendIds)
@@ -93,7 +103,7 @@ namespace Stacks_rework.Services
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
             if (res.isPrivate == false) return res;
             if (res.uid != uid || res.token != token) throw new DatabaseException(StatusCodes.Status403Forbidden);
-            return res;
+            return Helpers.hideToken(res);
         }
 
         public async Task<List<StackPreview>> ListFriendStacks(string uid)
@@ -145,11 +155,11 @@ namespace Stacks_rework.Services
             return stacksPreview;
         }
 
-        public async Task<AdvertisementStack> UpdateOrgStack(string id, string ownerid, string token, UpdateStack newStack)
+        public async Task<AdvertisementStack> UpdateOrgStack(string id, string token, UpdateStack newStack)
         {
             var res = await advertisementStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
-            if (res.token != token || res.organization.id != ownerid) throw new DatabaseException(StatusCodes.Status403Forbidden);
+            if (res.token != token) throw new DatabaseException(StatusCodes.Status403Forbidden);
             res = newStack.AutoMap<UpdateStack, AdvertisementStack>();
             await advertisementStacks.ReplaceOneAsync(s => s.id == id, res);
             return res;
@@ -157,12 +167,13 @@ namespace Stacks_rework.Services
 
         public async Task<UserStack> UpdateUserStack(string id, string ownerid, string token, UpdateStack newStack)
         {
+            if (Helpers.ValidateAuth(ownerid, token)) throw new DatabaseException(StatusCodes.Status403Forbidden);
             var res = await userStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
             if (res.token != token || res.uid != ownerid) throw new DatabaseException(StatusCodes.Status403Forbidden);
             res = newStack.AutoMap<UpdateStack, UserStack>();
             await userStacks.ReplaceOneAsync(s => s.id == id, res);
-            return res;
+            return Helpers.hideToken(res);
         }
     }
 }

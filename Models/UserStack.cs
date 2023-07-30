@@ -9,7 +9,6 @@ namespace Stacks_rework.Models
     {       
         [StringLength(9, ErrorMessage = "invalid user id")]
         public string uid { get; set; } = null!;
-        [JsonIgnore]
         public bool isPrivate { get; set; } = false;
     }
 }

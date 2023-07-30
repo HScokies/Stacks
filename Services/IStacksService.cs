@@ -7,15 +7,16 @@ namespace Stacks_rework.Services
     {
         #region Основной функционал
         public Task<UserStack> Create(UserStack userStack);
-        public Task<AdvertisementStack> CreateAdvertisementStack(AdvertisementStack adStack, string companyToken);
+        public Task<AdvertisementStack> CreateAdvertisementStack(AdvertisementStack adStack);
 
         public Task<UserStack> GetUserStack(string id, string uid, string token);
         public Task<AdvertisementStack> GetAdStack(string id);
 
         public Task<UserStack> UpdateUserStack(string id, string ownerid, string token, UpdateStack newStack);
-        public Task<AdvertisementStack> UpdateOrgStack(string id, string ownerid, string token, UpdateStack newStack);
+        public Task<AdvertisementStack> UpdateOrgStack(string id, string token, UpdateStack newStack);
 
         public Task DropUserStack(string id, string ownerid, string token);
+        public Task DropOrgStack(string id, string token);
         #endregion
 
         #region Главная Страница
