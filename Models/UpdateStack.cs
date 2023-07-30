@@ -1,9 +1,13 @@
-﻿namespace Stacks_rework.Models
+﻿using Amazon.Auth.AccessControlPolicy;
+using System.Text.Json.Serialization;
+
+namespace Stacks_rework.Models
 {
     public class UpdateStack
     {
-        public bool isPrivate { get; set; } = false;
-        public string thumbnail { get; set; } = null!;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? isPrivate { get; set; } = false;
+        public string? thumbnail { get; set; } = null!;
         public string name { get; set; } = null!;
         public List<Card> cards { get; set; } = null!;
     }

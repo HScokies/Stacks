@@ -9,8 +9,8 @@ namespace Stacks_rework.Models
     {
         [BsonId, BsonRepresentation(BsonType.ObjectId)]
         public string? id { get; set; }
-        public string? name { get; set; } = null!;
-        public string? logo { get; set; } = null!;
+        public string name { get; set; } = null!;
+        public string logo { get; set; } = null!;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string token { get; set; } = null!;
     }

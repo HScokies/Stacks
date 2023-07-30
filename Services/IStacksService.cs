@@ -26,11 +26,10 @@ namespace Stacks_rework.Services
 
         #region Страница Друзья
         public Task<List<FriendsPreview>> GetFriendsPreview(IEnumerable<string> friendIds);  // Получение превью для страницы друзья в формате "vk id - число стопок"
-        public Task<List<StackPreview>> ListFriendStacks(string uid); // Получение списка публичных стопок друга
         #endregion
 
-        #region Профиль пользователя
-        public Task<List<StackPreview>> ListPersonalStacks(string token, string uid); // Получение полного списка стопок пользователя
-        #endregion
+
+        public Task<List<StackPreview>> ListUserStacks(string uid);
+        public Task<List<StackPreview>> ListUserStacks(string uid, string token);
     }
 }

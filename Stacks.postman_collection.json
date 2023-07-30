@@ -1,0 +1,388 @@
+{
+	"info": {
+		"_postman_id": "aeafdb9d-9cb4-49b2-a2fb-bec536fe6956",
+		"name": "Stacks",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27999911"
+	},
+	"item": [
+		{
+			"name": "Issue token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/token",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user stack",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"token\": \"{{token}}\",\r\n    \"uid\": \"{{user_id}}\",\r\n    \"isPrivate\": false,\r\n    \"thumbnail\": null,\r\n    \"name\": \"unnamed stack\",   \r\n    \"cards\": [\r\n        {\r\n            \"question\": \"q1\",\r\n            \"answer\": \"a1\"\r\n        },\r\n        {\r\n            \"question\": \"q2\",\r\n            \"answer\": \"a2\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/stacks",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create organization stack",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"token\": \"{{org_token}}\",\r\n    \"isActive\": true,\r\n    \"thumbnail\": null,\r\n    \"name\": \"unnamed stack\",   \r\n    \"cards\": [\r\n        {\r\n            \"question\": \"q1\",\r\n            \"answer\": \"a1\"\r\n        },\r\n        {\r\n            \"question\": \"q2\",\r\n            \"answer\": \"a2\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/ad",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"ad"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read user stack",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					},
+					{
+						"key": "uid",
+						"value": "{{user_id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/{stack ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"{stack ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read organization stack",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/ad/{stack ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"ad",
+						"{stack ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user stack",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "token",
+						"value": "c0ba88fb-16cc-4648-8ab7-a824ed172c39",
+						"type": "text"
+					},
+					{
+						"key": "uid",
+						"value": "252598217",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"thumbnail\": \"https://sun9-1.userapi.com/impf/c846420/v846420985/1526c3/ISX7VF8NjZk.jpg?size=800x800&quality=96&sign=fefc1a684879e75bd9d36b4ba2907310\",\r\n    \"name\": \"unnamed stack - updated\",\r\n    \"isPrivate\": false,\r\n    \"cards\": [\r\n        {\r\n            \"question\": \"q1\",\r\n            \"answer\": \"a1\"\r\n        },\r\n        {\r\n            \"question\": \"q2\",\r\n            \"answer\": \"a2\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/{stack ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"{stack ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update organization  stack",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{org_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"thumbnail\": \"https://sun9-1.userapi.com/impf/c846420/v846420985/1526c3/ISX7VF8NjZk.jpg?size=800x800&quality=96&sign=fefc1a684879e75bd9d36b4ba2907310\",\r\n    \"name\": \"unnamed stack - updated\",\r\n    \"cards\": [\r\n        {\r\n            \"question\": \"q1\",\r\n            \"answer\": \"a1\"\r\n        },\r\n        {\r\n            \"question\": \"q2\",\r\n            \"answer\": \"a2\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/ad/{stack ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"ad",
+						"{stack ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user stack",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					},
+					{
+						"key": "uid",
+						"value": "{{user_id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/{stack ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"{stack ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete organization stack",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{org_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/ad/{stack ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"ad",
+						"{stack ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ads Preview",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/ads",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"ads"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Organization preview",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/organisation/{organization ObjectId}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"organisation",
+						"{organization ObjectId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Friends preview",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ids\": [\r\n        //array of vk user ids\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/users",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User preview",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/stacks/users/{vk user id (uid)}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"stacks",
+						"users",
+						"{vk user id (uid)}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "https://localhost:7057/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "c0ba88fb-16cc-4648-8ab7-a824ed172c39",
+			"type": "string"
+		},
+		{
+			"key": "org_token",
+			"value": "57d26f49-f155-4f01-abbd-d26e43e5f676",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "000000000",
+			"type": "string"
+		}
+	]
+}

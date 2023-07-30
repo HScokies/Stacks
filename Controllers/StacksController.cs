@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Stacks_rework.Models;
+using Stacks_rework.Models.Output;
 using Stacks_rework.Services;
 
 namespace Stacks_rework.Controllers
@@ -8,10 +9,10 @@ namespace Stacks_rework.Controllers
     [ApiController]
     public class StacksController : Controller
     {
-        private readonly IStacksService stacksRepos;
-        public StacksController(IStacksService _stacksRepos)
+        private readonly IStacksService stackRepos;
+        public StacksController(IStacksService _stackRepos)
         {
-            this.stacksRepos = _stacksRepos;
+            this.stackRepos = _stackRepos;
         }
 
         [HttpGet("token")]
@@ -25,7 +26,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                var res = await stacksRepos.Create(stack);
+                var res = await stackRepos.Create(stack);
                 return Created(res.id!, res);
             }
             catch (DatabaseException ex)
@@ -39,7 +40,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                var res = await stacksRepos.CreateAdvertisementStack(stack);
+                var res = await stackRepos.CreateAdvertisementStack(stack);
                 return Created(res.id!, res);
             }
             catch (DatabaseException ex)
@@ -53,7 +54,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                return Ok(await stacksRepos.GetUserStack(
+                return Ok(await stackRepos.GetUserStack(
                     id: id,
                     token: token,
                     uid: uid
@@ -70,7 +71,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                return Ok(await stacksRepos.GetAdStack(id));
+                return Ok(await stackRepos.GetAdStack(id));
             }
             catch (DatabaseException ex)
             {
@@ -83,7 +84,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                return await stacksRepos.UpdateUserStack(
+                return await stackRepos.UpdateUserStack(
                     id: id,
                     ownerid: uid,
                     token: token,
@@ -101,7 +102,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                return await stacksRepos.UpdateOrgStack(
+                return await stackRepos.UpdateOrgStack(
                     id: id,
                     token: token,
                     newStack: newStack
@@ -118,7 +119,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                await stacksRepos.DropUserStack(
+                await stackRepos.DropUserStack(
                     id: id,
                     ownerid: uid,
                     token: token
@@ -136,7 +137,7 @@ namespace Stacks_rework.Controllers
         {
             try
             {
-                await stacksRepos.DropOrgStack(
+                await stackRepos.DropOrgStack(
                     id: id,
                     token: token
                 );
@@ -148,6 +149,57 @@ namespace Stacks_rework.Controllers
             }
         }
 
+        [HttpGet("stacks/ads")]
+        public async Task<ActionResult<StackPreview>> GetAdPreview()
+        {
+            try
+            {
+                return Ok(await stackRepos.GetAdsPreview());
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
 
+        [HttpGet("stacks/organisation/{id:length(24)}")]
+        public async Task<ActionResult<StackPreview>> GetOrgPreview(string id)
+        {
+            try
+            {
+                return Ok(await stackRepos.ListOrgStacks(id));
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpGet("stacks/users")]
+        public async Task<ActionResult<StackPreview>> GetFriendsPreview(FriendIDs Friends)
+        {
+            try
+            {
+                return Ok(await stackRepos.GetFriendsPreview(Friends.ids));
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
+
+        [HttpGet("stacks/users/{uid:length(9)}")]
+        public async Task<ActionResult<StackPreview>> GetUserPreview(string uid,[FromHeader] string? token = null)
+        {
+            try
+            {
+                var res = token is null ? await stackRepos.ListUserStacks(uid) : await stackRepos.ListUserStacks(uid, token);
+                return  Ok(res);
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(ex.status);
+            }
+        }
     }
 }

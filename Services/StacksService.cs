@@ -63,6 +63,7 @@ namespace Stacks_rework.Services
                 var count = await advertisementStacks.Find(s => s.organization == org && s.isActive == true).CountDocumentsAsync();
                 if (count == 0) continue;
                 StackPreview stack = new(
+                    id: org.id!,
                     name:   org.name, 
                     thumb:  org.logo,
                     amount: count);
@@ -106,13 +107,32 @@ namespace Stacks_rework.Services
             return Helpers.hideToken(res);
         }
 
-        public async Task<List<StackPreview>> ListFriendStacks(string uid)
+        public async Task<List<StackPreview>> ListOrgStacks(string orgId)
+        {
+            var stacks = await advertisementStacks.Find(s => s.organization.id! == orgId && s.isActive == true).ToListAsync();
+
+            List<StackPreview> stacksPreview = new();
+            foreach (var stack in stacks)
+            {
+                StackPreview stackPreview = new(
+                    id: stack.id,
+                    name: stack.name,
+                    thumb: stack.thumbnail!,
+                    amount: stack.cards.Count()
+                );
+                stacksPreview.Add(stackPreview);
+            }
+            return stacksPreview;
+        }
+
+        public async Task<List<StackPreview>> ListUserStacks(string uid)
         {
             var stacks = await userStacks.Find(s => s.uid == uid && s.isPrivate == false).ToListAsync();
             List<StackPreview> stacksPreview = new();
             foreach (var stack in stacks)
             {
                 StackPreview stackPreview = new(
+                    id: stack.uid,
                     name: stack.name,
                     thumb: stack.thumbnail!,
                     amount: stack.cards.Count()
@@ -122,14 +142,14 @@ namespace Stacks_rework.Services
             return stacksPreview;
         }
 
-        public async Task<List<StackPreview>> ListOrgStacks(string orgId)
+        public async Task<List<StackPreview>> ListUserStacks(string uid, string token)
         {
-            var stacks = await advertisementStacks.Find(s => s.organization.id == orgId && s.isActive == true).ToListAsync();
-
+            var stacks = await userStacks.Find(s => s.uid == uid && s.token == token).ToListAsync();
             List<StackPreview> stacksPreview = new();
             foreach (var stack in stacks)
             {
                 StackPreview stackPreview = new(
+                    id: stack.id,
                     name: stack.name,
                     thumb: stack.thumbnail!,
                     amount: stack.cards.Count()
@@ -139,39 +159,27 @@ namespace Stacks_rework.Services
             return stacksPreview;
         }
 
-        public async Task<List<StackPreview>> ListPersonalStacks(string token, string uid)
-        {
-            var stacks = await userStacks.Find(s => s.uid == uid && s.token == token).ToListAsync();
-            List<StackPreview> stacksPreview = new();
-            foreach(var stack in stacks)
-            {
-                StackPreview stackPreview = new(
-                    name: stack.name,
-                    thumb: stack.thumbnail!,
-                    amount: stack.cards.Count()
-                );
-                stacksPreview.Add(stackPreview);
-            }
-            return stacksPreview;
-        }
-
-        public async Task<AdvertisementStack> UpdateOrgStack(string id, string token, UpdateStack newStack)
+        public async Task<AdvertisementStack> UpdateOrgStack(string id, string token, UpdateStack newStack) 
         {
             var res = await advertisementStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
             if (res.token != token) throw new DatabaseException(StatusCodes.Status403Forbidden);
-            res = newStack.AutoMap<UpdateStack, AdvertisementStack>();
+            res.thumbnail = newStack.thumbnail;
+            res.name = newStack.name;
+            res.cards = newStack.cards;
             await advertisementStacks.ReplaceOneAsync(s => s.id == id, res);
-            return res;
+            return Helpers.hideToken(res);
         }
 
         public async Task<UserStack> UpdateUserStack(string id, string ownerid, string token, UpdateStack newStack)
         {
-            if (Helpers.ValidateAuth(ownerid, token)) throw new DatabaseException(StatusCodes.Status403Forbidden);
             var res = await userStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
             if (res.token != token || res.uid != ownerid) throw new DatabaseException(StatusCodes.Status403Forbidden);
-            res = newStack.AutoMap<UpdateStack, UserStack>();
+            res.isPrivate = newStack.isPrivate??res.isPrivate;
+            res.thumbnail = newStack.thumbnail;
+            res.name = newStack.name;
+            res.cards = newStack.cards;
             await userStacks.ReplaceOneAsync(s => s.id == id, res);
             return Helpers.hideToken(res);
         }
