@@ -9,19 +9,11 @@ namespace Stacks_rework.Data
         public AppDbContext()
         {
       
-            var host = "localhost";
-            //Environment.GetEnvironmentVariable("HOST");
-            var port = "41400";
-                //Environment.GetEnvironmentVariable("PORT");
-            var user = "root";
-            //Environment.GetEnvironmentVariable("USER");
-            var password = "admin";
-            //Environment.GetEnvironmentVariable("PWD");
-
-            var db = "decks";
-            //Environment.GetEnvironmentVariable("DATABASE");
-            var collection = "decks";
-            //Environment.GetEnvironmentVariable("COLLECTION");
+            var host = Environment.GetEnvironmentVariable("HOST")?? "localhost";
+            var port = Environment.GetEnvironmentVariable("PORT")?? "41400";
+            var user = Environment.GetEnvironmentVariable("USER")?? "root";
+            var password = Environment.GetEnvironmentVariable("PASSWORD")?? "admin";
+            var db = Environment.GetEnvironmentVariable("DATABASE")?? "decks";
 
 
             var Client = new MongoClient($"mongodb://{user}:{password}@{host}:{port}/?authSource=admin");

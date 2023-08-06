@@ -10,7 +10,7 @@ namespace Stacks_rework.Services
         public Task<AdvertisementStack> CreateAdvertisementStack(AdvertisementStack adStack);
 
         public Task<UserStack> GetUserStack(string id, string uid, string token);
-        public Task<AdvertisementStack> GetAdStack(string id);
+        public Task<AdvertisementStack> GetAdStack(string id, string token = null);
 
         public Task<UserStack> UpdateUserStack(string id, string ownerid, string token, UpdateStack newStack);
         public Task<AdvertisementStack> UpdateOrgStack(string id, string token, UpdateStack newStack);

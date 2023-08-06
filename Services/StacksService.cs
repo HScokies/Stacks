@@ -20,7 +20,7 @@ namespace Stacks_rework.Services
         public async Task<UserStack> Create(UserStack userStack)
         {
             if (!Helpers.ValidateAuth(userStack.uid, userStack.token)) throw new DatabaseException(StatusCodes.Status400BadRequest);
-            var res = await userStacks.Find(u => u.uid == userStack.uid).FirstOrDefaultAsync();
+            var res = await (await userStacks.FindAsync(u => u.uid == userStack.uid)).FirstOrDefaultAsync();
             if (res!=null && res.token != userStack.token) throw new DatabaseException(StatusCodes.Status401Unauthorized);
             await userStacks.InsertOneAsync(userStack);
             return Helpers.hideToken(userStack);
@@ -73,10 +73,11 @@ namespace Stacks_rework.Services
             return adPreview;
         }
 
-        public async Task<AdvertisementStack> GetAdStack(string id)
+        public async Task<AdvertisementStack> GetAdStack(string id, string? token)
         {
             var res = await advertisementStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
+            if (res.token == token) return Helpers.hideToken(res);
             if (res.isActive == false) throw new DatabaseException(StatusCodes.Status423Locked);
             return Helpers.hideToken(res);
         }
@@ -102,7 +103,7 @@ namespace Stacks_rework.Services
         {
             var res = await userStacks.Find(s => s.id == id).FirstOrDefaultAsync();
             if (res is null) throw new DatabaseException(StatusCodes.Status404NotFound);
-            if (res.isPrivate == false) return res;
+            if (res.isPrivate == false) return Helpers.hideToken(res);
             if (res.uid != uid || res.token != token) throw new DatabaseException(StatusCodes.Status403Forbidden);
             return Helpers.hideToken(res);
         }

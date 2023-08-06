@@ -67,11 +67,11 @@ namespace Stacks_rework.Controllers
         }
 
         [HttpGet("stacks/ad/{id:length(24)}")]
-        public async Task<ActionResult<AdvertisementStack>> Read(string id)
+        public async Task<ActionResult<AdvertisementStack>> Read(string id, [FromHeader] string? token = null)
         {
             try
             {
-                return Ok(await stackRepos.GetAdStack(id));
+                return Ok(await stackRepos.GetAdStack(id, token));
             }
             catch (DatabaseException ex)
             {

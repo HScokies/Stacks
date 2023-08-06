@@ -29,11 +29,10 @@ services:
             - database
         environment:
             - HOST=localhost
-            - DATABASE=stacks
-            - COLLECTION=userStacks
+            - DATABASE=decks
             - PORT=27017
             - USER=root
-            - PWD=admin
+            - PASSWORD=admin
         volumes:
             - stacks:/src/app
         networks:
